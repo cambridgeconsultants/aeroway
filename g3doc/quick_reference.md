@@ -886,6 +886,9 @@ not a concern, these are equivalent to, and potentially more efficient than,
     <code>V **MaskedSatSubOr**(V no, M m, V a, V b)</code>: returns `a[i] +
     b[i]` saturated to the minimum/maximum representable value, or `no[i]` if
     `m[i]` is false.
+*   `V`: `{i,f}` \
+    <code>V **MaskedAbsOr**(M m, V a, V b)</code>: returns the absolute value of
+    `a[i]` where m is active and returns `b[i]` otherwise.
 
 #### Shifts
 
@@ -1049,6 +1052,9 @@ types, and on SVE/RVV.
     <code>V **Not**(V v)</code>: returns `~v[i]`.
 
 *   <code>V **AndNot**(V a, V b)</code>: returns `~a[i] & b[i]`.
+
+*   <code>V **MaskedOrOrZero**(M m, V a, V b)</code>: returns `a[i] || b[i]`
+    or `zero` if `m[i]` is false.
 
 The following three-argument functions may be more efficient than assembling
 them from 2-argument functions:
@@ -1756,6 +1762,9 @@ All functions except `Stream` are defined in cache_control.h.
     `DemoteToNearestInt(d, v)` is more efficient on some targets, including x86
     and RVV.
 
+*   <code>Vec&lt;D&gt; **MaskedConvertToOrZero**(M m, D d, V v)</code>: returns `v[i]`
+    converted to `D` where m is active and returns zero otherwise.
+
 #### Single vector demotion
 
 These functions demote a full vector (or parts thereof) into a vector of half
@@ -2237,6 +2246,22 @@ The following `ReverseN` must not be called if `Lanes(D()) < N`:
     must be in the range `[0, 2 * Lanes(d))` but need not be unique. The index
     type `TI` must be an integer of the same size as `TFromD<D>`.
 
+*   <code>V **TableLookupLanesOr**(M m, V a, V b, unspecified)</code> returns the
+    result of `TableLookupLanes(a, unspecified)` where `m[i]` is true, and returns
+    `b[i]` where `m[i]` is false.
+
+*   <code>V **TableLookupLanesOrZero**(M m, V a, unspecified)</code> returns
+    the result of `TableLookupLanes(a, unspecified)` where `m[i]` is true, and
+    returns zero where `m[i]` is false.
+
+*   <code>V **TwoTablesLookupLanesOr**(D d, M m, V a, V b, unspecified)</code>
+    returns the result of `TwoTablesLookupLanes(V a, V b, unspecified)` where
+    `m[i]` is true, and `a[i]` where `m[i]` is false.
+
+*   <code>V **TwoTablesLookupLanesOrZero**(D d, M m, V a, V b, unspecified)</code>
+    returns the result of `TwoTablesLookupLanes(V a, V b, unspecified)` where
+    `m[i]` is true, and zero where `m[i]` is false.
+
 *   <code>V **Per4LaneBlockShuffle**&lt;size_t kIdx3, size_t kIdx2, size_t
     kIdx1, size_t kIdx0&gt;(V v)</code> does a per 4-lane block shuffle of `v`
     if `Lanes(DFromV<V>())` is greater than or equal to 4 or a shuffle of the
@@ -2376,6 +2401,24 @@ more efficient on some targets.
 *   <code>T **ReduceSum**(D, V v)</code>: returns the sum of all lanes.
 *   <code>T **ReduceMin**(D, V v)</code>: returns the minimum of all lanes.
 *   <code>T **ReduceMax**(D, V v)</code>: returns the maximum of all lanes.
+
+### Masked reductions
+
+**Note**: Horizontal operations (across lanes of the same vector) such as
+reductions are slower than normal SIMD operations and are typically used outside
+critical loops.
+
+All ops in this section ignore lanes where `mask=false`. These are equivalent
+to, and potentially more efficient than, `GetLane(SumOfLanes(d,
+IfThenElseZero(m, v)))` etc. The result is implementation-defined when all mask
+elements are false.
+
+*   <code>T **MaskedReduceSum**(D, M m, V v)</code>: returns the sum of all lanes
+    where `m[i]` is `true`.
+*   <code>T **MaskedReduceMin**(D, M m, V v)</code>: returns the minimum of all
+    lanes where `m[i]` is `true`.
+*   <code>T **MaskedReduceMax**(D, M m, V v)</code>: returns the maximum of all
+    lanes where `m[i]` is `true`.
 
 ### Crypto
 
