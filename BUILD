@@ -87,10 +87,10 @@ selects.config_setting_group(
 
 # Additional warnings for Clang OR GCC (skip for MSVC)
 CLANG_GCC_COPTS = [
-    "-Wunused",
+    "-Wunused-parameter",
+    "-Wunused-variable",
     "-Wextra-semi",
     "-Wunreachable-code",
-    "-Wshadow",
 ]
 
 # Warnings supported by Clang and Clang-cl
@@ -109,7 +109,6 @@ CLANG_OR_CLANGCL_OPTS = CLANG_GCC_COPTS + [
     "-Wtautological-overlap-compare",
     "-Wthread-safety-analysis",
     "-Wundefined-func-template",
-    "-Wunreachable-code-aggressive",
     "-Wunused-comparison",
 ]
 
