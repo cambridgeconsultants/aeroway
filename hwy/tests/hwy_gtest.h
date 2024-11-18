@@ -565,7 +565,16 @@ struct RegisterRunAll {
     static_assert(true, "For requiring trailing semicolon")
 
 // Must be followed by semicolon, then a closing brace for ONE namespace.
-#define HWY_AFTER_TEST() } /* RunAll*/
+#define HWY_AFTER_TEST()                          \
+  } /* RunAll*/                                   \
+  } /* namespace */                               \
+  int main(int argc, char** argv) {               \
+    hwy::InitTestProgramOptions(argc, argv);      \
+    hwy::GetRunAll()();                           \
+    if (!hwy::ShouldOnlyListHighwayTestNames()) { \
+      fprintf(stderr, "Success.\n");              \
+    }                                             \
+    return 0
 
 // -------------------- Non-SIMD test cases:
 
@@ -621,10 +630,6 @@ struct RegisterTest {
           func_and_name.func();                                            \
         }                                                                  \
       }                                                                    \
-    }                                                                      \
-    const auto run_all_simd_tests_func = hwy::GetRunAll();                 \
-    if (run_all_simd_tests_func) {                                         \
-      run_all_simd_tests_func();                                           \
     }                                                                      \
     if (!hwy::ShouldOnlyListHighwayTestNames()) {                          \
       fprintf(stderr, "Success.\n");                                       \
