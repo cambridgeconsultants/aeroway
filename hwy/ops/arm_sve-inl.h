@@ -2849,6 +2849,41 @@ HWY_API svfloat32_t DemoteTo(Simd<float, N, kPow2> d, const svuint64_t v) {
 HWY_SVE_FOREACH_F(HWY_SVE_CONVERT, ConvertTo, cvt)
 #undef HWY_SVE_CONVERT
 
+// ------------------------------ MaskedConvertToOrZero F
+
+#define HWY_SVE_MASKED_CONVERT_TO_OR_ZERO(BASE, CHAR, BITS, HALF, NAME, OP) \
+  /* Float from signed */                                                   \
+  template <size_t N, int kPow2>                                            \
+  HWY_API HWY_SVE_V(BASE, BITS)                                             \
+      NAME(svbool_t m, HWY_SVE_D(BASE, BITS, N, kPow2) /* d */,             \
+           HWY_SVE_V(int, BITS) v) {                                        \
+    return sv##OP##_##CHAR##BITS##_s##BITS##_z(m, v);                       \
+  }                                                                         \
+  /* Float from unsigned */                                                 \
+  template <size_t N, int kPow2>                                            \
+  HWY_API HWY_SVE_V(BASE, BITS)                                             \
+      NAME(svbool_t m, HWY_SVE_D(BASE, BITS, N, kPow2) /* d */,             \
+           HWY_SVE_V(uint, BITS) v) {                                       \
+    return sv##OP##_##CHAR##BITS##_u##BITS##_z(m, v);                       \
+  }                                                                         \
+  /* Signed from float, rounding toward zero */                             \
+  template <size_t N, int kPow2>                                            \
+  HWY_API HWY_SVE_V(int, BITS)                                              \
+      NAME(svbool_t m, HWY_SVE_D(int, BITS, N, kPow2) /* d */,              \
+           HWY_SVE_V(BASE, BITS) v) {                                       \
+    return sv##OP##_s##BITS##_##CHAR##BITS##_z(m, v);                       \
+  }                                                                         \
+  /* Unsigned from float, rounding toward zero */                           \
+  template <size_t N, int kPow2>                                            \
+  HWY_API HWY_SVE_V(uint, BITS)                                             \
+      NAME(svbool_t m, HWY_SVE_D(uint, BITS, N, kPow2) /* d */,             \
+           HWY_SVE_V(BASE, BITS) v) {                                       \
+    return sv##OP##_u##BITS##_##CHAR##BITS##_z(m, v);                       \
+  }
+
+HWY_SVE_FOREACH_F(HWY_SVE_MASKED_CONVERT_TO_OR_ZERO, MaskedConvertToOrZero, cvt)
+#undef HWY_SVE_MASKED_CONVERT_TO_OR_ZERO
+
 // ------------------------------ NearestInt (Round, ConvertTo)
 template <class VF, class DI = RebindToSigned<DFromV<VF>>>
 HWY_API VFromD<DI> NearestInt(VF v) {
@@ -2861,6 +2896,39 @@ HWY_API VFromD<DI32> DemoteToNearestInt(DI32 di32,
                                         VFromD<Rebind<double, DI32>> v) {
   // No single instruction, round then demote.
   return DemoteTo(di32, Round(v));
+}
+
+// ------------------------------ DemoteTo (Alternate Rounding)
+#ifdef HWY_NATIVE_DEMOTE_CEIL_TO
+#undef HWY_NATIVE_DEMOTE_CEIL_TO
+#else
+#define HWY_NATIVE_DEMOTE_CEIL_TO
+#endif
+
+template <class DI32, HWY_IF_I32_D(DI32)>
+HWY_API VFromD<DI32> DemoteCeilTo(DI32 di32, VFromD<Rebind<double, DI32>> v) {
+  return DemoteTo(di32, Ceil(v));
+}
+
+template <class D16, HWY_IF_F16_D(D16)>
+HWY_API VFromD<D16> DemoteCeilTo(D16 d16, VFromD<Rebind<float, D16>> v) {
+  return DemoteTo(d16, Ceil(v));
+}
+
+#ifdef HWY_NATIVE_DEMOTE_FLOOR_TO
+#undef HWY_NATIVE_DEMOTE_FLOOR_TO
+#else
+#define HWY_NATIVE_DEMOTE_FLOOR_TO
+#endif
+
+template <class DI32, HWY_IF_I32_D(DI32)>
+HWY_API VFromD<DI32> DemoteFloorTo(DI32 di32, VFromD<Rebind<double, DI32>> v) {
+  return DemoteTo(di32, Floor(v));
+}
+
+template <class D16, HWY_IF_F16_D(D16)>
+HWY_API VFromD<D16> DemoteFloorTo(D16 d16, VFromD<Rebind<float, D16>> v) {
+  return DemoteTo(d16, Floor(v));
 }
 
 // ------------------------------ Iota (Add, ConvertTo)
