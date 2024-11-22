@@ -7346,11 +7346,6 @@ HWY_API V BitShuffle(V v, VI idx) {
 #endif  // HWY_NATIVE_BITSHUFFLE
 
 template <class V, class M>
-HWY_API V MaskedMaxOrZero(M m, V a, V b) {
-  return IfThenElseZero(m, (Max(a, b)));
-}
-
-template <class V, class M>
 HWY_API V MaskedOrOrZero(M m, V a, V b) {
   return IfThenElseZero(m, Or(a, b));
 }

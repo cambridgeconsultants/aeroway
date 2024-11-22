@@ -1302,11 +1302,6 @@ HWY_SVE_FOREACH_F(HWY_SVE_FMA, NegMulSub, nmad)
 
 #undef HWY_SVE_FMA
 
-// ------------------------------ MaskedMulAdd
-namespace detail {
-HWY_SVE_FOREACH(HWY_SVE_RETV_ARGMVVV, MaskedMulAdd, mad)
-}
-
 // ------------------------------ Round etc.
 
 HWY_SVE_FOREACH_F(HWY_SVE_RETV_ARGPV, Round, rintn)
@@ -1550,7 +1545,6 @@ HWY_API svbool_t LowerHalfOfMask(D /*d*/, svbool_t m) {
 namespace detail {
 HWY_SVE_FOREACH(HWY_SVE_RETV_ARGMVV, MaskedMin, min)
 HWY_SVE_FOREACH(HWY_SVE_RETV_ARGMVV, MaskedMax, max)
-HWY_SVE_FOREACH(HWY_SVE_RETV_ARGMVVZ, MaskedMaxOrZero, max)
 HWY_SVE_FOREACH(HWY_SVE_RETV_ARGMVV, MaskedAdd, add)
 HWY_SVE_FOREACH(HWY_SVE_RETV_ARGMVV, MaskedSub, sub)
 HWY_SVE_FOREACH(HWY_SVE_RETV_ARGMVV, MaskedMul, mul)
