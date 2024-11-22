@@ -892,12 +892,6 @@ HWY_SVE_FOREACH_IF(HWY_SVE_RETV_ARGPV, Abs, abs)
 HWY_SVE_FOREACH_I(HWY_SVE_RETV_ARGPV, SaturatedAbs, qabs)
 #endif  // HWY_SVE_HAVE_2
 
-// ------------------------------ MaskedAbsOr
-HWY_SVE_FOREACH_IF(HWY_SVE_RETV_ARGMV_M, MaskedAbsOr, abs)
-
-// ------------------------------ MaskedAbsOrZero
-HWY_SVE_FOREACH_IF(HWY_SVE_RETV_ARGMV_Z, MaskedAbsOrZero, abs)
-
 // ================================================== ARITHMETIC
 
 // Per-target flags to prevent generic_ops-inl.h defining Add etc.

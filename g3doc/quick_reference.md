@@ -886,9 +886,6 @@ not a concern, these are equivalent to, and potentially more efficient than,
     <code>V **MaskedSatSubOr**(V no, M m, V a, V b)</code>: returns `a[i] +
     b[i]` saturated to the minimum/maximum representable value, or `no[i]` if
     `m[i]` is false.
-*   `V`: `{i,f}` \
-    <code>V **MaskedAbsOr**(M m, V a, V b)</code>: returns the absolute value of
-    `a[i]` where m is active and returns `b[i]` otherwise.
 
 #### Shifts
 
